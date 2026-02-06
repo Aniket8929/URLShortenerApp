@@ -6,7 +6,7 @@ import Herosection from "@/Pages/Herosection"
 
 import { createBrowserRouter } from "react-router-dom"
 import ProtectedRoute from "./ProtectedRoute";
-import Signupform from "@/Auth/Signup";
+import Signupform from "@/Auth/Signupform";
 const Router = createBrowserRouter([
     {
         path: "/",
