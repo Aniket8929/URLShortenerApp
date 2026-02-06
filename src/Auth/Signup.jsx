@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
-function Signup() {
+function Signupform() {
   const { Signup } = useAuth();
   const navigate = useNavigate();
 
@@ -210,4 +210,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default Signupform;
