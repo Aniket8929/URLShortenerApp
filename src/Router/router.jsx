@@ -1,11 +1,11 @@
 import App from "@/App";
-import LoginForm from "@/Auth/LoginForm";
-import SignupForm from "@/Auth/SignupForm";
 import Dashboard from "@/Pages/Dashboard";
 import HeroSection from "@/Pages/HeroSection";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import { AuthLayout } from "@/Auth/Auth.layout";
+import SignupForm from "@/Auth/Signupform";
+import LoginForm from "@/Auth/Loginform";
 
 const AppRouter = createBrowserRouter([
   {
