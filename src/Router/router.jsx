@@ -20,6 +20,7 @@ const AppRouter = createBrowserRouter([
         path: "dashboard",
         element: (
           <ProtectedRoute>
+            
             <Dashboard />
           </ProtectedRoute>
         ),
