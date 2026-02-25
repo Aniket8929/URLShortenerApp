@@ -1,11 +1,11 @@
-import App from "@/App";
-import Dashboard from "@/Pages/Dashboard";
-import HeroSection from "@/Pages/HeroSection";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import ProtectedRoute from "./ProtectedRoute";
-import { AuthLayout } from "@/Auth/Auth.layout";
 import SignupForm from "@/Auth/Signupform";
 import LoginForm from "@/Auth/Loginform";
+import Herosection from "@/Pages/Herosection";
+import Dashboard from "@/Pages/Dashboard";
+import App from "@/App";
+import ProtectedRoute from "./ProtectedRoute";
+import { AuthLayout } from "@/Auth/Auth.layout";
 
 const AppRouter = createBrowserRouter([
   {
@@ -14,7 +14,7 @@ const AppRouter = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <HeroSection />,
+        element: <Herosection />,
       },
       {
         path: "dashboard",
