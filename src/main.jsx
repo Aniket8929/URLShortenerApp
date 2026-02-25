@@ -2,17 +2,17 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { RouterProvider } from "react-router-dom";
-import Router from "./Router/router";
+import AppRouter from "./Router/router";
 import { TooltipProvider } from "./components/ui/tooltip";
-import AuthContextProvider from "./Auth/AuthContext";
+import { AuthProvider } from "./Auth/AuthContext";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <AuthContextProvider>
+    <AuthProvider>
       <TooltipProvider>
-        <RouterProvider router={Router}>
-        </RouterProvider>
+        <RouterProvider router={AppRouter} />
+
       </TooltipProvider>
-    </AuthContextProvider>
+    </AuthProvider>
   </React.StrictMode>
 );

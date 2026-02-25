@@ -1,92 +1,84 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { supabase } from "../lib/supabaseClient";
+import React, { createContext, useContext, useState } from "react";
 
-export const AuthContext = createContext();
+const AuthContext = createContext();
 
-function AuthContextProvider({ children }) {
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem("user");
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      setSession(data.session);
+  // Save user in localStorage
+  const saveUser = (userData) => {
+    localStorage.setItem("user", JSON.stringify(userData));
+  };
+
+  // Login function
+  const login = async (email, password) => {
+    try {
+      setLoading(true);
+      const res = await fetch("https://hr-testing.onrender.com/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();      
+       if (!res.ok) {
+        return { error: data?.message || "Login failed" };
+      }
+      const userEmail = data?.data?.email;
+      setUser(userEmail);
+      saveUser(userEmail);
+      return { data: userEmail };
+    } catch (error) {
+      console.error(error);
+      return { error: "Login failed. Try again." };
+    } finally {
       setLoading(false);
-    };
-
-    getSession();
-
-    // Listen to auth changes (login/logout)
-    const { data: listener } =
-      supabase.auth.onAuthStateChange(
-        (_event, session) => {
-          setSession(session);
-        }
-      );
-
-    return () => {
-      listener.subscription.unsubscribe();
-    };
-  }, []);
-
-  // LOGIN
-  const Login = async (email, password) => {
-    const { data, error } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-    return { data, error };
+    }
   };
 
-  // SIGNUP
-  const Signup = async (name, email, password) => {
-    const { data, error } =
-      await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: name,
-          },
-        },
+  const register = async (name, email, password) => {
+    try {
+      setLoading(true);
+      const res = await fetch("https://hr-testing.onrender.com/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
       });
 
-    return { data, error };
+      const data = await res.json();
+
+      if (!res.ok) {
+        return { error: data?.message || "Registration failed" };
+      }
+
+      const registeredUser = data?.data?.user?.email || email;
+      setUser(registeredUser);
+      saveUser(registeredUser);
+      return { data: registeredUser };
+    } catch (error) {
+      console.error(error);
+      return { error: "Registration failed. Try again." };
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const Logout = async () => {
-    await supabase.auth.signOut();
+  const logout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        session,
-        user: session?.user ?? null,
-        Login,
-        Signup,
-        Logout,
-        isAuthenticated: !!session,
-        loading,
-      }}
-    >
+    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
-}
-
-export default AuthContextProvider;
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error(
-      "useAuth must be used inside AuthContextProvider"
-    );
-  }
-
-  return context;
 };
+
+// Hook to use AuthContext
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAuth = () => useContext(AuthContext);

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 function Navbar() {
-    const { isAuthenticated, Logout } = useAuth();
+    const { user, logout } = useAuth();
     const [open, setOpen] = useState(false);
     const navLinks = [
         { name: "HOME", to: "/" },
@@ -53,9 +53,9 @@ lg:hidden">
             )}
 
             <div className="relative z-50 flex items-center space-x-3">
-                {isAuthenticated ? (
+                {user ? (
                     <button
-                        onClick={Logout}
+                        onClick={logout}
                         className="rounded-md bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-red-600 hover:shadow-lg hover:shadow-red-500/25 sm:px-6 sm:text-base"
                     >
                         Logout

@@ -13,201 +13,121 @@ import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
-function Signupform() {
-  const { Signup } = useAuth();
+function SignupForm() {
+  const { register, loading } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    confirmPassword: "",
   });
-
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [serverError, setServerError] = useState("");
-
-  // 🔹 Better Email Validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // Auto-clear field error when user types
-    setErrors((prev) => ({
-      ...prev,
-      [name]: "",
-    }));
-
-    setServerError("");
-  };
-
-  const validate = () => {
-    let newErrors = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = "Full name is required";
-    }
-
-    if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Enter a valid email address";
-    }
-
-    if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-
-    if (!/[A-Z]/.test(formData.password)) {
-      newErrors.password = "Password must include at least one uppercase letter";
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    return newErrors;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
 
-    if (loading) return; // Prevent double submit
-
-    const validationErrors = validate();
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+    if (!formData.name || !formData.email || !formData.password) {
+      setError("Please fill in all fields");
       return;
     }
 
     try {
-      setLoading(true);
-      setServerError("");
-
-      const result = await Signup(
-        formData.name.trim(),
-        formData.email.trim(),
-        formData.password
-      );
-
+      const result = await register(formData.name, formData.email, formData.password);
       if (result?.error) {
-        setServerError(result.error.message);
+        setError(result.error.message);
         return;
       }
-
       navigate("/dashboard");
-
-    } catch (err) {
-      setServerError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+    } catch {
+      setError("Something went wrong. Please try again.");
     }
   };
 
-  const isFormValid =
-    formData.name &&
-    formData.email &&
-    formData.password &&
-    formData.confirmPassword;
-
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 bg-muted/40">
-      <Card className="w-full max-w-md shadow-xl border">
-        <CardHeader>
-          <CardTitle>Create Account</CardTitle>
-          <CardDescription>
-            Enter your details to create your account
-          </CardDescription>
-        </CardHeader>
+    <Card className="w-full max-w-md shadow-xl bg-transparent text-white border-none rounded-xl">
+      <CardHeader>
+        <CardTitle>Create Account</CardTitle>
+        <CardDescription className="text-white">
+          Enter your details to create your account
+        </CardDescription>
+      </CardHeader>
 
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label className="mb-1.5 text-gray-200">Full Name</Label>
+            <Input
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Enter your name"
+              className="bg-gray-900/50 placeholder-gray-400 text-white border-gray-600"
+            />
+          </div>
 
-            <div>
-              <Label>Full Name</Label>
-              <Input
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-              />
-              {errors.name && (
-                <p className="text-sm text-red-500 mt-1">{errors.name}</p>
-              )}
-            </div>
+          <div>
+            <Label className="mb-1.5 text-gray-200">Email</Label>
+            <Input
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter your email"
+              className="bg-gray-900/50 placeholder-gray-400 text-white border-gray-600"
+            />
+          </div>
 
-            <div>
-              <Label>Email</Label>
-              <Input
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-              {errors.email && (
-                <p className="text-sm text-red-500 mt-1">{errors.email}</p>
-              )}
-            </div>
-
-            <div>
-              <Label>Password</Label>
+          <div>
+            <Label className="mb-1.5 text-gray-200">Password</Label>
+            <div className="relative">
               <Input
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={formData.password}
                 onChange={handleChange}
+                placeholder="Enter your password"
+                className="bg-gray-900/50 placeholder-gray-400 text-white border-gray-600"
               />
-              {errors.password && (
-                <p className="text-sm text-red-500 mt-1">{errors.password}</p>
-              )}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-2 text-sm text-gray-300 hover:text-white transition"
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
             </div>
+          </div>
 
-            <div>
-              <Label>Confirm Password</Label>
-              <Input
-                name="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-              />
-              {errors.confirmPassword && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.confirmPassword}
-                </p>
-              )}
-            </div>
+          {error && <p className="text-sm text-red-500">{error}</p>}
 
-            {serverError && (
-              <p className="text-sm text-red-500">{serverError}</p>
-            )}
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition disabled:opacity-50"
+          >
+            {loading ? "Creating Account..." : "Sign Up"}
+          </Button>
+        </form>
+      </CardContent>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading || !isFormValid}
-            >
-              {loading ? "Creating Account..." : "Sign Up"}
-            </Button>
-
-          </form>
-        </CardContent>
-
-        <CardFooter className="justify-center">
-          <p className="text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link to="/auth/login" className="text-primary hover:underline">
-              Login
-            </Link>
-          </p>
-        </CardFooter>
-      </Card>
-    </div>
+      <CardFooter className="justify-center">
+        <p className="text-sm text-amber-50">
+          Already have an account?{" "}
+          <Link to="/auth/login" className="text-blue-600 hover:underline">
+            Login
+          </Link>
+        </p>
+      </CardFooter>
+    </Card>
   );
 }
 
-export default Signupform;
+export default SignupForm;

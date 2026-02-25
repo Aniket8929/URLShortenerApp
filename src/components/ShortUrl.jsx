@@ -6,12 +6,13 @@ import { Navigate } from 'react-router-dom';
 
 function ShortUrl() {
 
-    const { isAuthenticated } = useAuth();
+    const { user } = useAuth();
     const inputRef = useRef();
+
     const [shortUrl, setShortUrl] = useState("");
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!isAuthenticated) {
+        if (!user) {
             return <Navigate to="/auth/login" replace />;
         }
         const inputtext = inputRef.current.value;

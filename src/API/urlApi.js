@@ -13,15 +13,10 @@ async function urlShorterApi(longUrl) {
         }
 
         const data = await res.json();
-
-        console.log("API Response:", data);
-
         if (!data.short_url) {
             throw new Error("Invalid response from API");
         }
-
         return data.short_url;
-
     } catch (error) {
         console.error("Error:", error.message);
         return null;

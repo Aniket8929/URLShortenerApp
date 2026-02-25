@@ -44,8 +44,7 @@ const features = [
   },
 ];
 
-function Herosection() {
-  const items = [
+ const items = [
     {
       value: "item-1",
       trigger: "Is Trimrr really free?",
@@ -65,6 +64,7 @@ function Herosection() {
         "Yes, creating an account allows you to manage and track your shortened URLs securely.",
     },
   ];
+function Herosection() {
 
   return (
     <section className="px-4 py-20 text-white">
